@@ -10,6 +10,8 @@ import FeaturedProducts from "./components/FeaturedProducts";
 import AboutSection from "./components/AboutSection";
 import ProductsPage from "./components/ProductsPage";
 import ProductDetail from "./components/ProductDetail";
+import CartPage from "./components/CartPage";
+import WishlistPage from "./components/WishlistPage";
 import { useState } from "react";
 
 function HomePage() {
@@ -39,6 +41,8 @@ function App() {
               element={<ProductsPage searchQuery={searchQuery} />}
             />
             <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/wishlist" element={<WishlistPage />} />
           </Routes>
 
           <Footer />
