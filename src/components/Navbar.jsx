@@ -1,0 +1,64 @@
+import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext";
+
+export default function Navbar({ onSearch }) {
+  const { cartCount } = useCart();
+
+  return (
+    <nav className="sticky top-0 z-50 bg-black/95 backdrop-blur-md border-b border-[#d4af37]/30">
+      <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-3">
+          <span className="text-xl font-black italic text-[#d4af37]">
+            QAZI AUTO
+          </span>
+        </Link>
+
+        {/* Right Side */}
+        <div className="flex items-center gap-4">
+          {/* Search Input */}
+          <input
+            type="text"
+            placeholder="Search products..."
+            onChange={(e) => onSearch(e.target.value)}
+            className="hidden md:block bg-[#111] border border-[#d4af37]/50 rounded-full px-4 py-2 text-sm w-48 text-white focus:outline-none focus:border-[#d4af37]"
+          />
+
+          {/* Search Icon (Mobile) */}
+          <button className="md:hidden text-gray-400 hover:text-[#d4af37]">
+            <i className="fas fa-search text-lg"></i>
+          </button>
+
+          {/* Products Link */}
+          <Link
+            to="/products"
+            className="hidden md:block text-gray-400 hover:text-[#d4af37] transition font-bold text-sm"
+          >
+            Products
+          </Link>
+
+          {/* Cart */}
+          <Link
+            to="/cart"
+            className="relative text-gray-400 hover:text-[#d4af37] transition"
+          >
+            <i className="fas fa-shopping-cart text-lg"></i>
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </Link>
+
+          {/* Wishlist */}
+          <Link
+            to="/wishlist"
+            className="text-gray-400 hover:text-[#d4af37] transition"
+          >
+            <i className="fas fa-heart text-lg"></i>
+          </Link>
+        </div>
+      </div>
+    </nav>
+  );
+}
