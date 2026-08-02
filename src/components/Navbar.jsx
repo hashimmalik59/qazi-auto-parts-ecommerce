@@ -11,8 +11,13 @@ export default function Navbar({ onSearch }) {
       <div className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 md:gap-3">
+          <img
+            src="././public/Assets/logo.png"
+            alt="Logo of Qazi auto parts"
+            className="h-20"
+          />
           <span className="text-lg md:text-xl font-black italic text-[#d4af37]">
-            QAZI AUTO
+            QAZI AUTO PARTS
           </span>
         </Link>
 
