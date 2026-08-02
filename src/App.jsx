@@ -14,6 +14,8 @@ import ProductDetail from "./components/ProductDetail";
 import CartPage from "./components/CartPage";
 import WishlistPage from "./components/WishlistPage";
 import ScrollToTop from "./components/ScrollToTop";
+import NotFound from "./components/NotFound";
+
 import { useState } from "react";
 
 function HomePage() {
@@ -46,6 +48,7 @@ function App() {
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/wishlist" element={<WishlistPage />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
 
             <Footer />
