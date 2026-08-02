@@ -16,6 +16,9 @@ import ProductDetail from "./components/ProductDetail";
 import CartPage from "./components/CartPage";
 import WishlistPage from "./components/WishlistPage";
 import NotFound from "./components/NotFound";
+import { AuthProvider } from "./context/AuthContext";
+import LoginPage from "./components/LoginPage";
+import RegisterPage from "./components/RegisterPage";
 
 // Title change karne wala helper
 function usePageTitle(title) {
@@ -65,32 +68,34 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <CartProvider>
-      <ToastProvider>
-        <BrowserRouter>
-          <div className="min-h-screen bg-[#050505] text-[#e2e8f0] pb-20 md:pb-0">
-            <Navbar onSearch={setSearchQuery} />
-
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route
-                path="/products"
-                element={<ProductsPageWrapper searchQuery={searchQuery} />}
-              />
-              <Route path="/product/:id" element={<ProductDetailWrapper />} />
-              <Route path="/cart" element={<CartPageWrapper />} />
-              <Route path="/wishlist" element={<WishlistPageWrapper />} />
-              <Route path="*" element={<NotFoundWrapper />} />
-            </Routes>
-
-            <Footer />
-            <WhatsAppFloat />
-            <ScrollToTop />
-            <MobileNav />
-          </div>
-        </BrowserRouter>
-      </ToastProvider>
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <ToastProvider>
+          <BrowserRouter>
+            <div className="min-h-screen bg-[#050505] text-[#e2e8f0] pb-20 md:pb-0">
+              <Navbar onSearch={setSearchQuery} />
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route
+                  path="/products"
+                  element={<ProductsPageWrapper searchQuery={searchQuery} />}
+                />
+                <Route path="/product/:id" element={<ProductDetailWrapper />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/wishlist" element={<WishlistPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="*" element={<NotFoundWrapper />} />
+              </Routes>
+              <Footer />
+              <WhatsAppFloat />
+              <ScrollToTop />
+              <MobileNav />
+            </div>
+          </BrowserRouter>
+        </ToastProvider>
+      </CartProvider>
+    </AuthProvider>
   );
 }
 
