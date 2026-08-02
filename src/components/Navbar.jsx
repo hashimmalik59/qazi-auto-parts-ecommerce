@@ -1,35 +1,39 @@
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useState } from "react";
 
 export default function Navbar({ onSearch }) {
   const { cartCount } = useCart();
+  const [searchOpen, setSearchOpen] = useState(false);
 
   return (
     <nav className="sticky top-0 z-50 bg-black/95 backdrop-blur-md border-b border-[#d4af37]/30">
-      <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-3">
-          <span className="text-xl font-black italic text-[#d4af37]">
+        <Link to="/" className="flex items-center gap-2 md:gap-3">
+          <span className="text-lg md:text-xl font-black italic text-[#d4af37]">
             QAZI AUTO
           </span>
         </Link>
 
         {/* Right Side */}
-        <div className="flex items-center gap-4">
-          {/* Search Input */}
+        <div className="flex items-center gap-3 md:gap-4">
+          {/* Desktop Search */}
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder="Search..."
             onChange={(e) => onSearch(e.target.value)}
-            className="hidden md:block bg-[#111] border border-[#d4af37]/50 rounded-full px-4 py-2 text-sm w-48 text-white focus:outline-none focus:border-[#d4af37]"
+            className="hidden md:block bg-[#111] border border-[#d4af37]/50 rounded-full px-4 py-2 text-sm w-48 lg:w-64 text-white focus:outline-none focus:border-[#d4af37]"
           />
 
-          {/* Search Icon (Mobile) */}
-          <button className="md:hidden text-gray-400 hover:text-[#d4af37]">
+          {/* Mobile Search Toggle */}
+          <button
+            onClick={() => setSearchOpen(!searchOpen)}
+            className="md:hidden text-gray-400 hover:text-[#d4af37]"
+          >
             <i className="fas fa-search text-lg"></i>
           </button>
 
-          {/* Products Link */}
           <Link
             to="/products"
             className="hidden md:block text-gray-400 hover:text-[#d4af37] transition font-bold text-sm"
@@ -59,6 +63,19 @@ export default function Navbar({ onSearch }) {
           </Link>
         </div>
       </div>
+
+      {/* Mobile Search Bar (Expandable) */}
+      {searchOpen && (
+        <div className="md:hidden px-4 pb-3">
+          <input
+            type="text"
+            placeholder="Search products..."
+            autoFocus
+            onChange={(e) => onSearch(e.target.value)}
+            className="w-full bg-[#111] border border-[#d4af37]/50 rounded-full px-4 py-2 text-sm text-white focus:outline-none focus:border-[#d4af37]"
+          />
+        </div>
+      )}
     </nav>
   );
 }

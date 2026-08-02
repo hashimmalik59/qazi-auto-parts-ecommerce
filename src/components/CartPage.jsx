@@ -5,7 +5,6 @@ export default function CartPage() {
   const { cart, removeFromCart, updateQty, cartTotal, clearCart } = useCart();
   const navigate = useNavigate();
 
-  // WhatsApp pe poora cart bhejna
   const checkoutWhatsApp = () => {
     const items = cart
       .map(
@@ -54,54 +53,60 @@ export default function CartPage() {
             {cart.map((item) => (
               <div
                 key={item.id}
-                className="bg-[#111] border border-[#222] rounded-2xl p-4 flex gap-4 items-center"
+                className="bg-[#111] border border-[#222] rounded-2xl p-3 md:p-4 flex flex-col sm:flex-row gap-3 md:gap-4 items-start sm:items-center"
               >
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-20 h-20 object-contain bg-black rounded-xl"
-                  onError={(e) => {
-                    e.target.src = "/Assets/placeholder.png";
-                  }}
-                />
-
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] text-gray-500 uppercase font-bold">
-                    {item.sku}
-                  </p>
-                  <h3 className="text-white font-bold truncate">{item.name}</h3>
-                  <p className="text-[#d4af37] font-bold">${item.price}</p>
+                <div className="flex gap-3 w-full sm:w-auto items-center">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-16 h-16 md:w-20 md:h-20 object-contain bg-black rounded-xl flex-shrink-0"
+                    onError={(e) => {
+                      e.target.src = "/Assets/placeholder.png";
+                    }}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] text-gray-500 uppercase font-bold">
+                      {item.sku}
+                    </p>
+                    <h3 className="text-white font-bold text-sm md:text-base truncate">
+                      {item.name}
+                    </h3>
+                    <p className="text-[#d4af37] font-bold text-sm">
+                      ${item.price}
+                    </p>
+                  </div>
                 </div>
 
-                {/* Quantity +/- */}
-                <div className="flex items-center border border-[#d4af37]/30 rounded-lg">
-                  <button
-                    onClick={() => updateQty(item.id, item.qty - 1)}
-                    className="px-3 py-1 text-[#d4af37]"
-                  >
-                    -
-                  </button>
-                  <span className="px-3 py-1 text-white font-bold text-sm">
-                    {item.qty}
-                  </span>
-                  <button
-                    onClick={() => updateQty(item.id, item.qty + 1)}
-                    className="px-3 py-1 text-[#d4af37]"
-                  >
-                    +
-                  </button>
-                </div>
+                <div className="flex items-center justify-between w-full sm:w-auto gap-4">
+                  <div className="flex items-center border border-[#d4af37]/30 rounded-lg">
+                    <button
+                      onClick={() => updateQty(item.id, item.qty - 1)}
+                      className="px-3 py-1 text-[#d4af37]"
+                    >
+                      -
+                    </button>
+                    <span className="px-3 py-1 text-white font-bold text-sm">
+                      {item.qty}
+                    </span>
+                    <button
+                      onClick={() => updateQty(item.id, item.qty + 1)}
+                      className="px-3 py-1 text-[#d4af37]"
+                    >
+                      +
+                    </button>
+                  </div>
 
-                <div className="text-right min-w-[60px]">
-                  <p className="text-white font-bold">
-                    ${item.price * item.qty}
-                  </p>
-                  <button
-                    onClick={() => removeFromCart(item.id)}
-                    className="text-red-500 text-xs hover:text-red-400 mt-1"
-                  >
-                    <i className="fas fa-trash"></i> Remove
-                  </button>
+                  <div className="text-right">
+                    <p className="text-white font-bold">
+                      ${item.price * item.qty}
+                    </p>
+                    <button
+                      onClick={() => removeFromCart(item.id)}
+                      className="text-red-500 text-xs hover:text-red-400 mt-1"
+                    >
+                      <i className="fas fa-trash"></i> Remove
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
