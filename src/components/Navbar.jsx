@@ -3,7 +3,8 @@ import { useCart } from "../context/CartContext";
 import { useState } from "react";
 
 export default function Navbar({ onSearch }) {
-  const { cartCount } = useCart();
+  const { cartCount, wishlist } = useCart();
+  const wishlistCount = wishlist.length;
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
@@ -12,9 +13,9 @@ export default function Navbar({ onSearch }) {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 md:gap-3">
           <img
-            src="././public/Assets/logo.png"
+            src="/Assets/logo.png"
             alt="Logo of Qazi auto parts"
-            className="h-20"
+            className="h-12 md:h-14"
           />
           <span className="text-lg md:text-xl font-black italic text-[#d4af37]">
             QAZI AUTO PARTS
@@ -59,12 +60,17 @@ export default function Navbar({ onSearch }) {
             )}
           </Link>
 
-          {/* Wishlist */}
+          {/* Wishlist with Badge */}
           <Link
             to="/wishlist"
-            className="text-gray-400 hover:text-[#d4af37] transition"
+            className="relative text-gray-400 hover:text-[#d4af37] transition"
           >
             <i className="fas fa-heart text-lg"></i>
+            {wishlistCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                {wishlistCount}
+              </span>
+            )}
           </Link>
         </div>
       </div>
