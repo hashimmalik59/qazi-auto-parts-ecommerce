@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
+import { ToastProvider } from "./context/ToastContext";
 import Navbar from "./components/Navbar";
 import MobileNav from "./components/MobileNav";
 import WhatsAppFloat from "./components/WhatsAppFloat";
@@ -30,26 +31,28 @@ function App() {
 
   return (
     <CartProvider>
-      <BrowserRouter>
-        <div className="min-h-screen bg-[#050505] text-[#e2e8f0] pb-20 md:pb-0">
-          <Navbar onSearch={setSearchQuery} />
+      <ToastProvider>
+        <BrowserRouter>
+          <div className="min-h-screen bg-[#050505] text-[#e2e8f0] pb-20 md:pb-0">
+            <Navbar onSearch={setSearchQuery} />
 
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route
-              path="/products"
-              element={<ProductsPage searchQuery={searchQuery} />}
-            />
-            <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/wishlist" element={<WishlistPage />} />
-          </Routes>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route
+                path="/products"
+                element={<ProductsPage searchQuery={searchQuery} />}
+              />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/wishlist" element={<WishlistPage />} />
+            </Routes>
 
-          <Footer />
-          <WhatsAppFloat />
-          <MobileNav />
-        </div>
-      </BrowserRouter>
+            <Footer />
+            <WhatsAppFloat />
+            <MobileNav />
+          </div>
+        </BrowserRouter>
+      </ToastProvider>
     </CartProvider>
   );
 }

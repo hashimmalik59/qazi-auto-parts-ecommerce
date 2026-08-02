@@ -1,16 +1,19 @@
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useToast } from "../context/ToastContext";
 import { useState } from "react";
 
 export default function ProductCard({ product }) {
   const navigate = useNavigate();
   const { addToCart, isWishlisted, toggleWishlist } = useCart();
+  const { showToast } = useToast();
   const [added, setAdded] = useState(false);
 
   const handleAdd = (e) => {
     e.stopPropagation();
     addToCart(product);
     setAdded(true);
+    showToast(`${product.name} added to cart!`, "success");
     setTimeout(() => setAdded(false), 1500);
   };
 
@@ -19,7 +22,6 @@ export default function ProductCard({ product }) {
       className="bg-black border-2 border-[#d4af37]/30 rounded-2xl overflow-hidden cursor-pointer group relative hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(212,175,55,0.2)] transition-all duration-400"
       onClick={() => navigate(`/product/${product.id}`)}
     >
-      {/* Badges */}
       {product.badge === "popular" && (
         <span className="absolute top-3 right-3 bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full z-10 animate-pulse">
           🔥 TOP
@@ -31,7 +33,6 @@ export default function ProductCard({ product }) {
         </span>
       )}
 
-      {/* Image */}
       <div className="h-48 bg-[#0a0a0a] flex items-center justify-center p-4 relative overflow-hidden">
         <img
           src={product.image}
@@ -41,14 +42,12 @@ export default function ProductCard({ product }) {
             e.target.src = "/Assets/placeholder.png";
           }}
         />
-
-        {/* Wishlist Button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             toggleWishlist(product.id);
           }}
-          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center hover:bg-[#d4af37] transition z-20"
+          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center hover:bg-[#d4af37] hover:text-black transition z-20"
         >
           <i
             className={`fas fa-heart ${isWishlisted(product.id) ? "text-red-500" : "text-gray-400"}`}
@@ -56,7 +55,6 @@ export default function ProductCard({ product }) {
         </button>
       </div>
 
-      {/* Info */}
       <div className="p-5 text-center">
         <p className="text-[10px] text-[#d4af37] uppercase tracking-widest font-bold mb-1">
           Genuine Spare Part
@@ -72,11 +70,7 @@ export default function ProductCard({ product }) {
         <div className="flex gap-2">
           <button
             onClick={handleAdd}
-            className={`flex-1 py-2 rounded-lg font-extrabold text-xs uppercase tracking-tighter transition-all ${
-              added
-                ? "bg-green-500 text-white"
-                : "bg-[#d4af37] text-black hover:bg-yellow-500"
-            }`}
+            className={`flex-1 py-2 rounded-lg font-extrabold text-xs uppercase tracking-tighter transition-all ${added ? "bg-green-500 text-white" : "bg-[#d4af37] text-black hover:bg-yellow-500"}`}
           >
             {added ? "✓ Added" : "Add to Cart"}
           </button>
