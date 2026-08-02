@@ -13,6 +13,7 @@ import ProductsPage from "./components/ProductsPage";
 import ProductDetail from "./components/ProductDetail";
 import CartPage from "./components/CartPage";
 import WishlistPage from "./components/WishlistPage";
+import ScrollToTop from "./components/ScrollToTop";
 import { useState } from "react";
 
 function HomePage() {
@@ -49,6 +50,7 @@ function App() {
 
             <Footer />
             <WhatsAppFloat />
+            <ScrollToTop />
             <MobileNav />
           </div>
         </BrowserRouter>
