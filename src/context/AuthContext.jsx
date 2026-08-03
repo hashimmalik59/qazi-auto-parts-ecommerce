@@ -14,10 +14,15 @@ export function AuthProvider({ children }) {
       setLoading(false);
     });
 
-    // Listen for login/logout changes
+    // Listen for login/logout changes (✅ YAHAN CHANGE KIYA HAI)
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
+      (event, session) => {
+        // Agar SIGNED_IN event hai toh user set karo, agar SIGNED_OUT hai toh null karo
+        if (event === "SIGNED_IN") {
+          setUser(session?.user ?? null);
+        } else if (event === "SIGNED_OUT") {
+          setUser(null);
+        }
         setLoading(false);
       },
     );
