@@ -6,6 +6,7 @@ import { useToast } from "../context/ToastContext";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
   const { showToast } = useToast();
@@ -19,7 +20,8 @@ export default function LoginPage() {
       showToast("Welcome back!", "success");
       navigate("/");
     } catch (error) {
-      showToast(error.message, "error");
+      // Error message ko clean kar diya hai
+      showToast(error.message || "Invalid email or password", "error");
     } finally {
       setLoading(false);
     }
@@ -54,14 +56,25 @@ export default function LoginPage() {
             <label className="text-gray-400 text-xs uppercase font-bold block mb-1">
               Password
             </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-black border border-[#333] rounded-lg px-4 py-3 text-white focus:border-[#d4af37] focus:outline-none transition"
-              placeholder="••••••••"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-black border border-[#333] rounded-lg px-4 py-3 text-white focus:border-[#d4af37] focus:outline-none transition pr-12"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#d4af37] transition"
+              >
+                <i
+                  className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
+                ></i>
+              </button>
+            </div>
           </div>
 
           <button

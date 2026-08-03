@@ -15,13 +15,17 @@ export function AuthProvider({ children }) {
     });
 
     // Listen for login/logout changes
-    const { data: listener } = supabase.auth.onAuthStateChange(
+    const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user ?? null);
+        setLoading(false);
       },
     );
 
-    return () => listener.subscription.unsubscribe();
+    // Cleanup function (Ye console warnings ko hatata hai)
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
   }, []);
 
   // Register
@@ -44,6 +48,7 @@ export function AuthProvider({ children }) {
   // Logout
   const signOut = async () => {
     await supabase.auth.signOut();
+    setUser(null);
   };
 
   return (

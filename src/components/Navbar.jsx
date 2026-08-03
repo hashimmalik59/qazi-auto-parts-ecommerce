@@ -1,11 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 
 export default function Navbar({ onSearch }) {
   const { cartCount, wishlist } = useCart();
+  const { user, signOut } = useAuth();
   const wishlistCount = wishlist.length;
   const [searchOpen, setSearchOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <nav className="sticky top-0 z-50 bg-black/95 backdrop-blur-md border-b border-[#d4af37]/30">
@@ -46,6 +49,32 @@ export default function Navbar({ onSearch }) {
           >
             Products
           </Link>
+
+          {/* 🟢 YAHAN SE LOGIN / LOGOUT CODE SHURU HO RAHA HAI 🟢 */}
+          {user ? (
+            <div className="flex items-center gap-3">
+              <span className="text-[#d4af37] text-sm hidden md:block max-w-[100px] truncate">
+                {user.email}
+              </span>
+              <button
+                onClick={async () => {
+                  await signOut();
+                  navigate("/login");
+                }}
+                className="text-red-400 hover:text-red-600 font-bold text-sm transition"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="text-[#d4af37] font-bold hover:text-white transition"
+            >
+              Login
+            </Link>
+          )}
+          {/* 🟢 LOGIN / LOGOUT CODE YAHAN KHATAM 🟢 */}
 
           {/* Cart */}
           <Link
