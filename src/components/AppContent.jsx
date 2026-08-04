@@ -91,9 +91,10 @@ export default function AppContent() {
 
       {!isAuthPage && <Footer />}
 
-      <WhatsAppFloat />
-      <ScrollToTop />
-      <MobileNav />
+      {/* 🟢 YAHAN 3 LINES UPDATE KI HAIN */}
+      {!isAuthPage && <WhatsAppFloat />}
+      {!isAuthPage && <ScrollToTop />}
+      {!isAuthPage && <MobileNav />}
     </div>
   );
 }
