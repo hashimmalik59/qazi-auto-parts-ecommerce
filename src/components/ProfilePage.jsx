@@ -43,6 +43,19 @@ export default function ProfilePage() {
             <p className="text-gray-400 text-xs uppercase font-bold">User ID</p>
             <p className="text-gray-300 text-sm break-all">{user.uid}</p>
           </div>
+
+          {/* 🔥 WhatsApp Support Button */}
+          <div className="pt-2">
+            <a
+              href="https://wa.me/8615158939407?text=Hi, I need help with my account"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-lg border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-black transition font-bold"
+            >
+              <i className="fab fa-whatsapp text-xl"></i>
+              Contact Support
+            </a>
+          </div>
         </div>
       </div>
     </div>
