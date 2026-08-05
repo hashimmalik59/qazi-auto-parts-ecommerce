@@ -77,7 +77,14 @@ export default function AppContent() {
       {!isAuthPage && <Navbar onSearch={setSearchQuery} />}
 
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/products"
           element={<ProductsPageWrapper searchQuery={searchQuery} />}
