@@ -50,12 +50,10 @@ export default function Navbar({ onSearch }) {
             Products
           </Link>
 
-          {/* 🟢 YAHAN SE LOGIN / LOGOUT CODE SHURU HO RAHA HAI 🟢 */}
+          {/* 🟢 FINAL LOGIN / LOGOUT BUTTON */}
           {user ? (
-            <div className="flex items-center gap-3">
-              <span className="text-[#d4af37] text-sm hidden md:block max-w-[100px] truncate">
-                {user.email}
-              </span>
+            <div>
+              <span className="text-[12px] mx-2">{user.email}</span>
               <button
                 onClick={async () => {
                   await signOut();
@@ -74,7 +72,7 @@ export default function Navbar({ onSearch }) {
               Login
             </Link>
           )}
-          {/* 🟢 LOGIN / LOGOUT CODE YAHAN KHATAM 🟢 */}
+          {/* 🟢 BUTTON CODE YAHAN KHATAM */}
 
           {/* Cart */}
           <Link

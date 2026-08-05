@@ -14,10 +14,10 @@ export function AuthProvider({ children }) {
       setLoading(false);
     });
 
-    // Listen for login/logout changes (✅ YAHAN CHANGE KIYA HAI)
+    // Listen for login/logout changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        // Agar SIGNED_IN event hai toh user set karo, agar SIGNED_OUT hai toh null karo
+        console.log("Auth Event:", event, "Session:", session);
         if (event === "SIGNED_IN") {
           setUser(session?.user ?? null);
         } else if (event === "SIGNED_OUT") {
@@ -27,20 +27,25 @@ export function AuthProvider({ children }) {
       },
     );
 
-    // Cleanup function (Ye console warnings ko hatata hai)
+    // Cleanup function
     return () => {
       authListener?.subscription?.unsubscribe();
     };
   }, []);
 
-  // Register
   const signUp = async (email, password) => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: window.location.origin,
+      },
+    });
     if (error) throw error;
     return data;
   };
 
-  // Login
+  // Login (Sabse simple aur pakka version)
   const signIn = async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
