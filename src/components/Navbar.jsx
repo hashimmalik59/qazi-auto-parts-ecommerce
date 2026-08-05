@@ -20,7 +20,7 @@ export default function Navbar({ onSearch }) {
             alt="Logo of Qazi auto parts"
             className="h-12 md:h-14"
           />
-          <span className="text-lg md:text-xl font-black italic text-[#d4af37]">
+          <span className="hidden md:block text-lg md:text-xl font-black italic text-[#d4af37]">
             QAZI AUTO PARTS
           </span>
         </Link>
