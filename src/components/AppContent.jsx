@@ -19,6 +19,7 @@ import NotFound from "./NotFound";
 import LoginPage from "./LoginPage";
 import RegisterPage from "./RegisterPage";
 import ProtectedRoute from "./ProtectedRoute"; // ✅ YEH IMPORT ADD KIYA HAI
+import ProfilePage from "./ProfilePage";
 
 // Title change karne wala helper
 function usePageTitle(title) {
@@ -111,6 +112,14 @@ export default function AppContent() {
         />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<NotFoundWrapper />} />
       </Routes>
 
