@@ -4,7 +4,6 @@ import { useToast } from "../context/ToastContext";
 import { useState } from "react";
 
 export default function ProductCard({ product }) {
-  // ✅ Ab sirf 'product' object accept karega
   const navigate = useNavigate();
   const { addToCart, isInWishlist, addToWishlist, removeFromWishlist } =
     useCart();
@@ -48,7 +47,7 @@ export default function ProductCard({ product }) {
         </span>
       )}
 
-      <div className="h-48 bg-[#0a0a0a] flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="h-40 md:h-48 bg-[#0a0a0a] flex items-center justify-center p-4 relative overflow-hidden">
         <img
           src={product.image}
           alt={product.name}
@@ -67,19 +66,19 @@ export default function ProductCard({ product }) {
         </button>
       </div>
 
-      <div className="p-5 text-center">
-        <p className="text-[10px] text-[#d4af37] uppercase tracking-widest font-bold mb-1">
+      <div className="p-3 md:p-5 text-center">
+        <p className="text-[9px] md:text-[10px] text-[#d4af37] uppercase tracking-widest font-bold mb-1">
           Genuine Spare Part
         </p>
-        <h3 className="text-lg font-extrabold text-[#d4af37] italic mb-2">
+        <h3 className="text-base md:text-lg font-extrabold text-[#d4af37] italic mb-2">
           {product.name}
         </h3>
-        <p className="text-white font-bold text-xl mb-3">
+        <p className="text-white font-bold text-lg md:text-xl mb-3">
           ${product.price}{" "}
           <span className="text-gray-600 text-sm font-normal">/ pc</span>
         </p>
 
-        <div className="flex gap-2">
+        <div className="flex flex-col md:flex-row gap-2">
           <button
             onClick={handleAdd}
             className={`flex-1 py-2 rounded-lg font-extrabold text-xs uppercase tracking-tighter transition-all ${added ? "bg-green-500 text-white" : "bg-[#d4af37] text-black hover:bg-yellow-500"}`}

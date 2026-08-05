@@ -20,13 +20,13 @@ export default function Navbar({ onSearch }) {
             alt="Logo of Qazi auto parts"
             className="h-12 md:h-14"
           />
-          <span className="hidden md:block text-lg md:text-xl font-black italic text-[#d4af37]">
+          <span className="text-[10px] md:text-lg lg:text-xl font-black italic text-[#d4af37] truncate max-w-[80px] md:max-w-full">
             QAZI AUTO PARTS
           </span>
         </Link>
 
         {/* Right Side */}
-        <div className="flex items-center gap-3 md:gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           {/* Desktop Search */}
           <input
             type="text"
@@ -52,15 +52,15 @@ export default function Navbar({ onSearch }) {
 
           {/* 🟢 FINAL LOGIN / LOGOUT BUTTON */}
           {user ? (
-            <div className="flex items-center gap-3">
-              <span className="text-[12px] text-[#d4af37] mx-2">
+            <div className="flex items-center gap-1 md:gap-3">
+              <span className="text-[9px] md:text-[12px] text-[#d4af37] truncate max-w-[50px] md:max-w-[100px]">
                 {user.email}
               </span>
 
               {/* 🔥 YEH NAYA LINK ADD KIYA HAI (PROFILE PAGE KE LIYE) */}
               <Link
                 to="/profile"
-                className="text-white hover:text-[#d4af37] font-bold text-sm transition"
+                className="text-[10px] md:text-sm text-white hover:text-[#d4af37] font-bold transition"
               >
                 Profile
               </Link>
@@ -70,7 +70,7 @@ export default function Navbar({ onSearch }) {
                   await signOut();
                   navigate("/login");
                 }}
-                className="text-white hover:text-[#d4af37] font-bold text-sm transition"
+                className="text-[10px] md:text-sm text-white hover:text-[#d4af37] font-bold transition"
               >
                 Logout
               </button>
@@ -78,7 +78,7 @@ export default function Navbar({ onSearch }) {
           ) : (
             <Link
               to="/login"
-              className="text-[#d4af37] font-bold hover:text-white transition"
+              className="text-[12px] md:text-sm text-[#d4af37] font-bold hover:text-white transition"
             >
               Login/Register
             </Link>

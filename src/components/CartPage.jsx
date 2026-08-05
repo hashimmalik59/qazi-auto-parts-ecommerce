@@ -5,7 +5,6 @@ import { useToast } from "../context/ToastContext";
 import { products } from "../data/products";
 
 export default function CartPage() {
-  // ✅ YAHAN `removeFromCartCompletely` bhi import kiya
   const {
     cart,
     addToCart,
@@ -17,7 +16,6 @@ export default function CartPage() {
   const { user } = useAuth();
   const { showToast } = useToast();
 
-  // 🔥 Cart mein objects se pura product object dhundho
   const cartItems = cart
     .map((item) => {
       const product = products.find((p) => p.id === item.id);
@@ -71,7 +69,6 @@ export default function CartPage() {
           <p className="text-gray-400">{cartCount} items in cart</p>
         </div>
 
-        {/* 🗑️ Clear All Cart Button */}
         {cartItems.length > 0 && (
           <button
             onClick={async () => {
@@ -107,10 +104,10 @@ export default function CartPage() {
                 }}
               />
             </div>
-            <div className="flex-1 text-center sm:text-left">
+            <div className="flex-1 text-center sm:text-left w-full">
               <h3 className="text-[#d4af37] font-bold">{item.name}</h3>
               <p className="text-sm text-gray-400">SKU: {item.sku}</p>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mt-1">
                 <span className="text-white font-bold">${item.price}</span>
                 <span className="text-gray-500 text-sm">x {item.quantity}</span>
               </div>
@@ -118,28 +115,21 @@ export default function CartPage() {
                 = ${(item.price * item.quantity).toFixed(2)}
               </p>
             </div>
-            <div className="flex gap-2 mt-2 sm:mt-0">
-              {/* 🔄 Decrease Button */}
+            <div className="flex flex-wrap gap-2 mt-2 sm:mt-0 justify-center sm:justify-end w-full sm:w-auto">
               <button
                 onClick={() => removeFromCart(item.id)}
                 className="px-3 py-1 bg-red-500/10 border border-red-500 text-red-500 rounded hover:bg-red-500 hover:text-white transition"
               >
                 -
               </button>
-              {/* 🔄 Increase Button */}
               <button
-                onClick={() => {
-                  // ✅ Sirf product.id pass karo, poora product nahi
-                  addToCart({ id: item.id });
-                }}
+                onClick={() => addToCart({ id: item.id })}
                 className="px-3 py-1 bg-[#d4af37]/10 border border-[#d4af37] text-[#d4af37] rounded hover:bg-[#d4af37] hover:text-black transition"
               >
                 +
               </button>
-              {/* 🗑️ REMOVE BUTTON - POORA PRODUCT HATA DEGA ✅ FIX KAR DIYA */}
               <button
                 onClick={() => {
-                  // 🔥 Seedha `removeFromCartCompletely` call karo, quantity 1 ho ya 10, poora hata do
                   removeFromCartCompletely(item.id);
                   showToast("Removed from cart", "info");
                 }}
@@ -152,7 +142,6 @@ export default function CartPage() {
         ))}
       </div>
 
-      {/* 🟡 Checkout Section */}
       <div className="mt-8 p-6 bg-[#111] border border-[#d4af37]/30 rounded-xl">
         <div className="flex justify-between items-center text-lg font-bold">
           <span className="text-gray-400">Total:</span>
@@ -162,20 +151,14 @@ export default function CartPage() {
         </div>
         <button
           onClick={() => {
-            // Cart items ka message prepare karo
             const message = cartItems
               .map(
                 (item) =>
                   `- ${item.name} (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}`,
               )
               .join("\n");
-
             const totalMsg = `Total: $${totalPrice.toFixed(2)}`;
-
-            // WhatsApp link generate karo
             const whatsappUrl = `https://wa.me/8615158939407?text=Hi, I want to place an order:%0A%0A${encodeURIComponent(message)}%0A%0A${encodeURIComponent(totalMsg)}`;
-
-            // WhatsApp par bhejo
             window.open(whatsappUrl, "_blank");
           }}
           className="w-full mt-4 bg-[#d4af37] text-black font-black py-3 rounded-lg hover:bg-white transition"
