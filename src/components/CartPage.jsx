@@ -1,166 +1,187 @@
 import { useCart } from "../context/CartContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { products } from "../data/products";
 
 export default function CartPage() {
-  const { cart, removeFromCart, updateQty, cartTotal, clearCart } = useCart();
-  const navigate = useNavigate();
+  // ✅ YAHAN `removeFromCartCompletely` bhi import kiya
+  const {
+    cart,
+    addToCart,
+    removeFromCart,
+    removeFromCartCompletely,
+    clearCart,
+    cartCount,
+  } = useCart();
+  const { user } = useAuth();
+  const { showToast } = useToast();
 
-  const checkoutWhatsApp = () => {
-    const items = cart
-      .map(
-        (item) =>
-          `• ${item.name} (SKU: ${item.sku}) x${item.qty} = $${item.price * item.qty}`,
-      )
-      .join("\n");
+  // 🔥 Cart mein objects se pura product object dhundho
+  const cartItems = cart
+    .map((item) => {
+      const product = products.find((p) => p.id === item.id);
+      if (!product) return null;
+      return { ...product, quantity: item.quantity };
+    })
+    .filter((item) => item !== null);
 
-    const message = `Hi Qazi Auto Parts, I want to place an order:\n\n${items}\n\n*Total: $${cartTotal}*\n\nPlease confirm availability and shipping cost.`;
-    window.open(
-      `https://wa.me/8615158939407?text=${encodeURIComponent(message)}`,
-      "_blank",
-    );
-  };
+  const totalPrice = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
 
-  if (cart.length === 0) {
+  if (!user) {
     return (
-      <div className="animate-fade-in pt-20 pb-24 md:pb-10 text-center px-4">
-        <div className="max-w-md mx-auto">
-          <i className="fas fa-shopping-cart text-6xl text-gray-800 mb-6"></i>
-          <h2 className="text-2xl font-bold text-white mb-2">
-            Your Cart is Empty
-          </h2>
-          <p className="text-gray-500 mb-8">Add some products to get started</p>
-          <Link
-            to="/products"
-            className="bg-[#d4af37] text-black px-8 py-3 rounded-full font-bold hover:bg-white transition inline-block"
-          >
-            Browse Products
-          </Link>
-        </div>
+      <div className="min-h-[70vh] flex flex-col items-center justify-center text-gray-400">
+        <i className="fas fa-shopping-cart text-6xl mb-4 text-[#d4af37]"></i>
+        <p className="text-xl font-bold mb-2">Please login to view your cart</p>
+        <Link
+          to="/login"
+          className="bg-[#d4af37] text-black font-bold py-2 px-6 rounded-lg hover:bg-white transition"
+        >
+          Login
+        </Link>
+      </div>
+    );
+  }
+
+  if (cartItems.length === 0) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center text-gray-400">
+        <i className="fas fa-shopping-cart text-6xl mb-4 text-gray-600"></i>
+        <p className="text-xl font-bold mb-2">Your cart is empty</p>
+        <Link
+          to="/products"
+          className="bg-[#d4af37] text-black font-bold py-2 px-6 rounded-lg hover:bg-white transition"
+        >
+          Browse Products
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="animate-fade-in pt-10 pb-24 md:pb-10 px-4">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-black italic text-[#d4af37] mb-8">
-          Shopping Cart ({cart.length} items)
-        </h1>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Cart Items List */}
-          <div className="lg:col-span-2 space-y-4">
-            {cart.map((item) => (
-              <div
-                key={item.id}
-                className="bg-[#111] border border-[#222] rounded-2xl p-3 md:p-4 flex flex-col sm:flex-row gap-3 md:gap-4 items-start sm:items-center"
-              >
-                <div className="flex gap-3 w-full sm:w-auto items-center">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-16 h-16 md:w-20 md:h-20 object-contain bg-black rounded-xl flex-shrink-0"
-                    onError={(e) => {
-                      e.target.src = "/Assets/placeholder.png";
-                    }}
-                  />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[10px] text-gray-500 uppercase font-bold">
-                      {item.sku}
-                    </p>
-                    <h3 className="text-white font-bold text-sm md:text-base truncate">
-                      {item.name}
-                    </h3>
-                    <p className="text-[#d4af37] font-bold text-sm">
-                      ${item.price}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between w-full sm:w-auto gap-4">
-                  <div className="flex items-center border border-[#d4af37]/30 rounded-lg">
-                    <button
-                      onClick={() => updateQty(item.id, item.qty - 1)}
-                      className="px-3 py-1 text-[#d4af37]"
-                    >
-                      -
-                    </button>
-                    <span className="px-3 py-1 text-white font-bold text-sm">
-                      {item.qty}
-                    </span>
-                    <button
-                      onClick={() => updateQty(item.id, item.qty + 1)}
-                      className="px-3 py-1 text-[#d4af37]"
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  <div className="text-right">
-                    <p className="text-white font-bold">
-                      ${item.price * item.qty}
-                    </p>
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      className="text-red-500 text-xs hover:text-red-400 mt-1"
-                    >
-                      <i className="fas fa-trash"></i> Remove
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            <button
-              onClick={clearCart}
-              className="text-gray-500 text-sm hover:text-red-500 transition"
-            >
-              <i className="fas fa-trash-alt mr-1"></i> Clear Cart
-            </button>
-          </div>
-
-          {/* Order Summary */}
-          <div className="bg-[#111] border border-[#222] rounded-2xl p-6 h-fit">
-            <h3 className="text-white font-bold text-lg mb-4">Order Summary</h3>
-
-            <div className="space-y-2 mb-4">
-              <div className="flex justify-between text-gray-400 text-sm">
-                <span>Subtotal</span>
-                <span>${cartTotal}</span>
-              </div>
-              <div className="flex justify-between text-gray-400 text-sm">
-                <span>Shipping</span>
-                <span>Calculated later</span>
-              </div>
-            </div>
-
-            <div className="border-t border-[#222] pt-4 mb-6">
-              <div className="flex justify-between text-white font-bold text-xl">
-                <span>Total</span>
-                <span className="text-[#d4af37]">${cartTotal}</span>
-              </div>
-            </div>
-
-            <button
-              onClick={checkoutWhatsApp}
-              className="w-full py-3 rounded-xl bg-[#25D366] text-white font-black uppercase text-sm tracking-tighter hover:bg-[#1da851] transition mb-3 flex items-center justify-center gap-2"
-            >
-              <i className="fab fa-whatsapp"></i> Checkout via WhatsApp
-            </button>
-
-            <button
-              onClick={() => navigate("/products")}
-              className="w-full py-3 rounded-xl border border-[#d4af37] text-[#d4af37] font-bold text-sm hover:bg-[#d4af37] hover:text-black transition"
-            >
-              Continue Shopping
-            </button>
-
-            <p className="text-gray-600 text-[10px] text-center mt-4">
-              *Shipping cost will be confirmed by our team after order
-              placement.
-            </p>
-          </div>
+    <div className="max-w-7xl mx-auto px-4 py-10">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <div>
+          <h2 className="text-3xl font-black italic text-[#d4af37]">
+            Shopping Cart
+          </h2>
+          <p className="text-gray-400">{cartCount} items in cart</p>
         </div>
+
+        {/* 🗑️ Clear All Cart Button */}
+        {cartItems.length > 0 && (
+          <button
+            onClick={async () => {
+              if (
+                window.confirm(
+                  "Are you sure you want to clear your entire cart?",
+                )
+              ) {
+                await clearCart();
+                showToast("Cart cleared!", "info");
+              }
+            }}
+            className="px-4 py-2 bg-red-600/20 border border-red-500 text-red-500 font-bold text-sm rounded-lg hover:bg-red-500 hover:text-white transition"
+          >
+            Clear Cart
+          </button>
+        )}
+      </div>
+
+      <div className="space-y-4">
+        {cartItems.map((item) => (
+          <div
+            key={item.id}
+            className="bg-[#111] border border-[#333] rounded-xl p-4 flex flex-col sm:flex-row items-center gap-4"
+          >
+            <div className="w-20 h-20 bg-black rounded-lg flex items-center justify-center overflow-hidden">
+              <img
+                src={item.image}
+                alt={item.name}
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  e.target.src = "/Assets/placeholder.png";
+                }}
+              />
+            </div>
+            <div className="flex-1 text-center sm:text-left">
+              <h3 className="text-[#d4af37] font-bold">{item.name}</h3>
+              <p className="text-sm text-gray-400">SKU: {item.sku}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-white font-bold">${item.price}</span>
+                <span className="text-gray-500 text-sm">x {item.quantity}</span>
+              </div>
+              <p className="text-[#d4af37] font-bold mt-1">
+                = ${(item.price * item.quantity).toFixed(2)}
+              </p>
+            </div>
+            <div className="flex gap-2 mt-2 sm:mt-0">
+              {/* 🔄 Decrease Button */}
+              <button
+                onClick={() => removeFromCart(item.id)}
+                className="px-3 py-1 bg-red-500/10 border border-red-500 text-red-500 rounded hover:bg-red-500 hover:text-white transition"
+              >
+                -
+              </button>
+              {/* 🔄 Increase Button */}
+              <button
+                onClick={() => {
+                  // ✅ Sirf product.id pass karo, poora product nahi
+                  addToCart({ id: item.id });
+                }}
+                className="px-3 py-1 bg-[#d4af37]/10 border border-[#d4af37] text-[#d4af37] rounded hover:bg-[#d4af37] hover:text-black transition"
+              >
+                +
+              </button>
+              {/* 🗑️ REMOVE BUTTON - POORA PRODUCT HATA DEGA ✅ FIX KAR DIYA */}
+              <button
+                onClick={() => {
+                  // 🔥 Seedha `removeFromCartCompletely` call karo, quantity 1 ho ya 10, poora hata do
+                  removeFromCartCompletely(item.id);
+                  showToast("Removed from cart", "info");
+                }}
+                className="px-4 py-2 bg-red-500/20 border border-red-500 text-red-500 font-bold text-sm rounded-lg hover:bg-red-500 hover:text-white transition"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* 🟡 Checkout Section */}
+      <div className="mt-8 p-6 bg-[#111] border border-[#d4af37]/30 rounded-xl">
+        <div className="flex justify-between items-center text-lg font-bold">
+          <span className="text-gray-400">Total:</span>
+          <span className="text-[#d4af37] text-2xl">
+            ${totalPrice.toFixed(2)}
+          </span>
+        </div>
+        <button
+          onClick={() => {
+            // Cart items ka message prepare karo
+            const message = cartItems
+              .map(
+                (item) =>
+                  `- ${item.name} (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}`,
+              )
+              .join("\n");
+
+            const totalMsg = `Total: $${totalPrice.toFixed(2)}`;
+
+            // WhatsApp link generate karo
+            const whatsappUrl = `https://wa.me/8615158939407?text=Hi, I want to place an order:%0A%0A${encodeURIComponent(message)}%0A%0A${encodeURIComponent(totalMsg)}`;
+
+            // WhatsApp par bhejo
+            window.open(whatsappUrl, "_blank");
+          }}
+          className="w-full mt-4 bg-[#d4af37] text-black font-black py-3 rounded-lg hover:bg-white transition"
+        >
+          Proceed to Checkout
+        </button>
       </div>
     </div>
   );

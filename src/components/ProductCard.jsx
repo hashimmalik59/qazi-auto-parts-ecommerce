@@ -4,10 +4,14 @@ import { useToast } from "../context/ToastContext";
 import { useState } from "react";
 
 export default function ProductCard({ product }) {
+  // ✅ Ab sirf 'product' object accept karega
   const navigate = useNavigate();
-  const { addToCart, isWishlisted, toggleWishlist } = useCart();
+  const { addToCart, isInWishlist, addToWishlist, removeFromWishlist } =
+    useCart();
   const { showToast } = useToast();
   const [added, setAdded] = useState(false);
+
+  if (!product) return null;
 
   const handleAdd = (e) => {
     e.stopPropagation();
@@ -15,6 +19,17 @@ export default function ProductCard({ product }) {
     setAdded(true);
     showToast(`${product.name} added to cart!`, "success");
     setTimeout(() => setAdded(false), 1500);
+  };
+
+  const handleWishlistToggle = (e) => {
+    e.stopPropagation();
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+      showToast("Removed from wishlist", "info");
+    } else {
+      addToWishlist(product.id);
+      showToast(`${product.name} added to wishlist!`, "success");
+    }
   };
 
   return (
@@ -43,14 +58,11 @@ export default function ProductCard({ product }) {
           }}
         />
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleWishlist(product.id);
-          }}
+          onClick={handleWishlistToggle}
           className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center hover:bg-[#d4af37] hover:text-black transition z-20"
         >
           <i
-            className={`fas fa-heart ${isWishlisted(product.id) ? "text-red-500" : "text-gray-400"}`}
+            className={`fas fa-heart ${isInWishlist(product.id) ? "text-red-500" : "text-gray-400"}`}
           ></i>
         </button>
       </div>

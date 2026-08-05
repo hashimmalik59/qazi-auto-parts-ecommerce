@@ -77,20 +77,21 @@ export default function AppContent() {
       {!isAuthPage && <Navbar onSearch={setSearchQuery} />}
 
       <Routes>
-        <Route
+        {/* <Route
           path="/"
           element={
             <ProtectedRoute>
               <HomePage />
             </ProtectedRoute>
           }
-        />
+        /> */}
+        {/* 🔓 HOME PAGE PUBLIC KARO */}
+        <Route path="/" element={<HomePage />} />
         <Route
           path="/products"
           element={<ProductsPageWrapper searchQuery={searchQuery} />}
         />
         <Route path="/product/:id" element={<ProductDetailWrapper />} />
-
         {/* 🔥 PROTECTED ROUTES */}
         <Route
           path="/cart"
@@ -108,7 +109,6 @@ export default function AppContent() {
             </ProtectedRoute>
           }
         />
-
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="*" element={<NotFoundWrapper />} />

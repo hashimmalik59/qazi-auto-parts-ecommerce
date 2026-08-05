@@ -7,7 +7,7 @@ import ProductCard from "./ProductCard";
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart, isWishlisted, toggleWishlist } = useCart();
+  const { addToCart, isInWishlist, toggleWishlist } = useCart();
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
@@ -78,7 +78,7 @@ export default function ProductDetail() {
                 className="text-2xl transition"
               >
                 <i
-                  className={`fas fa-heart ${isWishlisted(product.id) ? "text-red-500" : "text-gray-600"}`}
+                  className={`fas fa-heart ${isInWishlist(product.id) ? "text-red-500" : "text-gray-600"}`}
                 ></i>
               </button>
             </div>

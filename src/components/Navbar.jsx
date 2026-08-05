@@ -80,7 +80,7 @@ export default function Navbar({ onSearch }) {
               to="/login"
               className="text-[#d4af37] font-bold hover:text-white transition"
             >
-              Login
+              Login/Register
             </Link>
           )}
           {/* 🟢 BUTTON CODE YAHAN KHATAM */}

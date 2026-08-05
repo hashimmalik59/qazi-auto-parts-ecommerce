@@ -1,101 +1,198 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import { db } from "../firebase";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+  onSnapshot,
+} from "firebase/firestore";
+import { useAuth } from "./AuthContext";
 
-// Step 1: Khali dabba (Context) banaya
 const CartContext = createContext();
 
-// Step 2: Provider component — ye sab ko data dega
 export function CartProvider({ children }) {
-  // Step 3: Cart data — localStorage se load karo, warna khali array
-  const [cart, setCart] = useState(() => {
-    const saved = localStorage.getItem("qap_cart");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [cart, setCart] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
-  // Step 4: Wishlist data — same logic
-  const [wishlist, setWishlist] = useState(() => {
-    const saved = localStorage.getItem("qap_wishlist");
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  // Step 5: Jab cart change ho, localStorage mein save karo
+  // 🔥 Firestore se data uthana (Jab user login ho)
   useEffect(() => {
-    localStorage.setItem("qap_cart", JSON.stringify(cart));
-  }, [cart]);
+    if (!user) {
+      setCart([]);
+      setWishlist([]);
+      setLoading(false);
+      return;
+    }
 
-  // Step 6: Jab wishlist change ho, localStorage mein save karo
-  useEffect(() => {
-    localStorage.setItem("qap_wishlist", JSON.stringify(wishlist));
-  }, [wishlist]);
+    const userDocRef = doc(db, "users", user.uid);
 
-  // ===== FUNCTIONS =====
-
-  // Product cart mein add karna
-  const addToCart = (product, qty = 1) => {
-    setCart((prev) => {
-      const exists = prev.find((item) => item.id === product.id);
-      if (exists) {
-        // Pehle se hai — quantity badhao
-        return prev.map((item) =>
-          item.id === product.id ? { ...item, qty: item.qty + qty } : item,
-        );
+    // Real-time listener (Data change par automatically update)
+    const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setCart(data.cart || []);
+        setWishlist(data.wishlist || []);
+      } else {
+        // Agar user ka document nahi hai, toh create karo
+        setDoc(userDocRef, { cart: [], wishlist: [] });
       }
-      // Naya product — add karo
-      return [...prev, { ...product, qty }];
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  // 🛒 Cart mein add karna (Quantity increment version)
+  const addToCart = async (product) => {
+    if (!user) return;
+    const userDocRef = doc(db, "users", user.uid);
+
+    // Check if product already exists in cart
+    const existingItem = cart.find((item) => item.id === product.id);
+
+    let updatedCart;
+
+    if (existingItem) {
+      // Agar already hai, toh quantity +1 karo (Poora array update karo, arrayUnion nahi)
+      updatedCart = cart.map((item) =>
+        item.id === product.id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item,
+      );
+    } else {
+      // Naya product add karo (quantity 1 ke saath)
+      const newItem = { id: product.id, quantity: 1 };
+      updatedCart = [...cart, newItem];
+    }
+
+    // 🔥 Firestore mein directly updatedCart set karo (arrayUnion use mat karo)
+    await updateDoc(userDocRef, { cart: updatedCart });
+    setCart(updatedCart);
+  };
+
+  // 🛒 Cart se remove karna (Fixed version)
+  const removeFromCart = async (productId) => {
+    if (!user) return;
+    if (!productId) return;
+    const userDocRef = doc(db, "users", user.uid);
+
+    const existingItem = cart.find((item) => item.id === productId);
+
+    if (!existingItem) return;
+
+    let updatedCart;
+
+    if (existingItem.quantity > 1) {
+      // Agar quantity 1 se zyada hai, toh quantity -1 karo
+      updatedCart = cart.map((item) =>
+        item.id === productId ? { ...item, quantity: item.quantity - 1 } : item,
+      );
+    } else {
+      // Agar quantity 1 hai, toh item ko poora hata do
+      updatedCart = cart.filter((item) => item.id !== productId);
+    }
+
+    // 🔥 Firestore mein directly updatedCart set karo
+    await updateDoc(userDocRef, { cart: updatedCart });
+    setCart(updatedCart);
+  };
+
+  // 🗑️ Cart se poora product hata do (chahe quantity kuch bhi ho)
+  const removeFromCartCompletely = async (productId) => {
+    if (!user) return;
+    if (!productId) return;
+    const userDocRef = doc(db, "users", user.uid);
+
+    // Cart mein se poora item hata do
+    const updatedCart = cart.filter((item) => item.id !== productId);
+
+    await updateDoc(userDocRef, { cart: updatedCart });
+    setCart(updatedCart);
+  };
+
+  // 🗑️ Clear whole cart
+  const clearCart = async () => {
+    if (!user) return;
+    const userDocRef = doc(db, "users", user.uid);
+    try {
+      await updateDoc(userDocRef, {
+        cart: [],
+      });
+      setCart([]);
+    } catch (error) {
+      console.error("Error clearing cart:", error);
+    }
+  };
+
+  // ❤️ Wishlist mein add karna (Duplicate-safe version)
+  const addToWishlist = async (productId) => {
+    if (!user) return;
+    // 🔥 Agar product already wishlist mein hai, toh kuch mat karo
+    if (wishlist.includes(productId)) {
+      return;
+    }
+    const userDocRef = doc(db, "users", user.uid);
+    await updateDoc(userDocRef, {
+      wishlist: arrayUnion(productId),
+    });
+    // 🔥 UI update karne se pehle check karo ki duplicate to nahi hai
+    setWishlist((prev) => {
+      if (prev.includes(productId)) return prev; // Already hai toh return
+      return [...prev, productId];
     });
   };
 
-  // Product cart se hatana
-  const removeFromCart = (id) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
+  // ❤️ Wishlist se remove karna (Safe version)
+  const removeFromWishlist = async (productId) => {
+    if (!user) return;
+    if (!productId) return; // 🔥 Agar ID undefined hai toh return
+    const userDocRef = doc(db, "users", user.uid);
+    await updateDoc(userDocRef, {
+      wishlist: arrayRemove(productId),
+    });
+    setWishlist((prev) => prev.filter((id) => id !== productId));
   };
 
-  // Quantity change karna (+/-)
-  const updateQty = (id, qty) => {
-    if (qty < 1) {
-      removeFromCart(id);
-      return;
-    }
-    setCart((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, qty } : item)),
-    );
+  // 🗑️ Clear whole wishlist
+  const clearWishlist = async () => {
+    if (!user) return;
+    const userDocRef = doc(db, "users", user.uid);
+    await updateDoc(userDocRef, {
+      wishlist: [],
+    });
+    setWishlist([]);
   };
 
-  // Cart khali karna
-  const clearCart = () => setCart([]);
+  // 📦 Calculate cart count (quantity ke hisaab se)
+  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
-  // Wishlist mein add/remove karna
-  const toggleWishlist = (id) => {
-    setWishlist(
-      (prev) =>
-        prev.includes(id)
-          ? prev.filter((w) => w !== id) // Hatana
-          : [...prev, id], // Add karna
-    );
-  };
+  // 📦 Check if product is in cart
+  const isInCart = (productId) => cart.some((item) => item.id === productId);
 
-  // Check karna ke product wishlist mein hai ya nahi
-  const isWishlisted = (id) => wishlist.includes(id);
+  // 📦 Check if product is in wishlist
+  const isInWishlist = (productId) => wishlist.includes(productId);
 
-  // Total price calculate karna
-  const cartTotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-
-  // Total items count (quantity included)
-  const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
-
-  // Step 7: Sab kuch return karo taake baqi components use kar saken
   return (
     <CartContext.Provider
       value={{
         cart,
+        wishlist,
+        loading,
         addToCart,
         removeFromCart,
-        updateQty,
+        removeFromCartCompletely,
         clearCart,
-        cartTotal,
+        addToWishlist,
+        removeFromWishlist,
+        clearWishlist,
+        isInCart,
+        isInWishlist,
         cartCount,
-        wishlist,
-        toggleWishlist,
-        isWishlisted,
+        wishlistCount: wishlist.length,
       }}
     >
       {children}
@@ -103,7 +200,6 @@ export function CartProvider({ children }) {
   );
 }
 
-// Step 8: Shortcut hook — har component mein asani se use hoga
 export function useCart() {
   return useContext(CartContext);
 }
