@@ -1,17 +1,29 @@
 import { useParams, Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
-import { products } from "../data/products";
+import { useProducts } from "../hooks/useProducts"; // ✅ Naya import
 import { useState } from "react";
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const product = products.find((p) => p.id === Number(id));
+  const { products, loading } = useProducts(); // ✅ Firestore se products fetch karo
   const { addToCart, isInWishlist, addToWishlist, removeFromWishlist } =
     useCart();
   const { showToast } = useToast();
   const [added, setAdded] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
+
+  // ✅ Loading state
+  if (loading) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center">
+        <i className="fas fa-spinner fa-spin text-4xl text-[#d4af37]"></i>
+      </div>
+    );
+  }
+
+  // ✅ Product ko Firestore ke products array mein se dhundho
+  const product = products.find((p) => p.id === Number(id));
 
   if (!product) {
     return (

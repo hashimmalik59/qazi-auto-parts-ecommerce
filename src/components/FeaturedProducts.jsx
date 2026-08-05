@@ -1,11 +1,27 @@
 import { Link } from "react-router-dom";
-import { products } from "../data/products";
+import { useProducts } from "../hooks/useProducts";
 import ProductCard from "./ProductCard";
 
 export default function FeaturedProducts() {
-  // Featured products: Headlight(20), Roof(4), Quarter Panel(8), Brake Pads(30), etc.
-  const featuredIds = [20, 4, 8, 30, 24, 36];
-  const featured = products.filter((p) => featuredIds.includes(p.id));
+  const { products, loading } = useProducts();
+
+  // ✅ Loading state handle karo
+  if (loading) {
+    return (
+      <section className="py-16 px-4 bg-[#080808] flex justify-center items-center">
+        <i className="fas fa-spinner fa-spin text-4xl text-[#d4af37]"></i>
+      </section>
+    );
+  }
+
+  // ✅ Featured products: Un products ko filter karo jinka badge "popular" hai
+  // Ya agar aapne Firestore mein koi flag daala hai (jaise isFeatured: true)
+  const featured = products.filter(
+    (p) => p.badge === "popular" || p.badge === "searched",
+  );
+
+  // ✅ Agar featured products nahi mile, toh random 4 products dikhao
+  const displayProducts = featured.length > 0 ? featured : products.slice(0, 4);
 
   return (
     <section className="py-16 px-4 bg-[#080808]">
@@ -15,7 +31,7 @@ export default function FeaturedProducts() {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featured.map((product) => (
+          {displayProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

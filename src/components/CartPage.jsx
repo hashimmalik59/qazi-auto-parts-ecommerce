@@ -2,7 +2,7 @@ import { useCart } from "../context/CartContext";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import { products } from "../data/products";
+import { useProducts } from "../hooks/useProducts";
 
 export default function CartPage() {
   const {
@@ -14,6 +14,7 @@ export default function CartPage() {
     cartCount,
   } = useCart();
   const { user } = useAuth();
+  const { products, loading: productsLoading } = useProducts();
   const { showToast } = useToast();
 
   const cartItems = cart
@@ -150,7 +151,8 @@ export default function CartPage() {
           </span>
         </div>
         <button
-          onClick={() => {
+          onClick={async () => {
+            // 1. WhatsApp message prepare karo
             const message = cartItems
               .map(
                 (item) =>
@@ -159,6 +161,37 @@ export default function CartPage() {
               .join("\n");
             const totalMsg = `Total: $${totalPrice.toFixed(2)}`;
             const whatsappUrl = `https://wa.me/8615158939407?text=Hi, I want to place an order:%0A%0A${encodeURIComponent(message)}%0A%0A${encodeURIComponent(totalMsg)}`;
+
+            // 2. Order ko Firestore mein save karo
+            try {
+              const orderData = {
+                items: cartItems.map((item) => ({
+                  name: item.name,
+                  sku: item.sku,
+                  quantity: item.quantity,
+                  price: item.price,
+                  total: item.price * item.quantity,
+                })),
+                total: totalPrice,
+                status: "pending",
+                createdAt: new Date().toISOString(),
+              };
+
+              // 🔥 Firestore mein orders collection mein save karo
+              const { addDoc, collection } = await import("firebase/firestore");
+              const { db } = await import("../firebase");
+              await addDoc(collection(db, "orders"), {
+                ...orderData,
+                userId: user.uid,
+              });
+
+              showToast("Order placed successfully!", "success");
+            } catch (error) {
+              console.error("Error saving order:", error);
+              showToast("Failed to save order history.", "error");
+            }
+
+            // 3. WhatsApp kholo
             window.open(whatsappUrl, "_blank");
           }}
           className="w-full mt-4 bg-[#d4af37] text-black font-black py-3 rounded-lg hover:bg-white transition"

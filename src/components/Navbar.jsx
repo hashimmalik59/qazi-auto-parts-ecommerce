@@ -8,6 +8,7 @@ export default function Navbar({ onSearch }) {
   const { user, signOut } = useAuth();
   const wishlistCount = wishlist.length;
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   return (
@@ -18,9 +19,9 @@ export default function Navbar({ onSearch }) {
           <img
             src="/Assets/logo.png"
             alt="Logo of Qazi auto parts"
-            className="h-12 md:h-14"
+            className="h-10 md:h-14"
           />
-          <span className="text-[10px] md:text-lg lg:text-xl font-black italic text-[#d4af37] truncate max-w-[80px] md:max-w-full">
+          <span className="text-sm md:text-lg lg:text-xl font-black italic text-[#d4af37] truncate max-w-[120px] md:max-w-full">
             QAZI AUTO PARTS
           </span>
         </Link>
@@ -40,9 +41,10 @@ export default function Navbar({ onSearch }) {
             onClick={() => setSearchOpen(!searchOpen)}
             className="md:hidden text-gray-400 hover:text-[#d4af37]"
           >
-            <i className="fas fa-search text-lg"></i>
+            <i className="fas fa-search text-base"></i>
           </button>
 
+          {/* Products Link (Desktop) */}
           <Link
             to="/products"
             className="hidden md:block text-gray-400 hover:text-[#d4af37] transition font-bold text-sm"
@@ -50,40 +52,88 @@ export default function Navbar({ onSearch }) {
             Products
           </Link>
 
-          {/* 🟢 FINAL LOGIN / LOGOUT BUTTON */}
-          {user ? (
-            <div className="flex items-center gap-1 md:gap-3">
-              <span className="text-[9px] md:text-[12px] text-[#d4af37] truncate max-w-[50px] md:max-w-[100px]">
-                {user.email}
-              </span>
-
-              {/* 🔥 YEH NAYA LINK ADD KIYA HAI (PROFILE PAGE KE LIYE) */}
-              <Link
-                to="/profile"
-                className="text-[10px] md:text-sm text-white hover:text-[#d4af37] font-bold transition"
-              >
-                Profile
-              </Link>
-
-              <button
-                onClick={async () => {
-                  await signOut();
-                  navigate("/login");
-                }}
-                className="text-[10px] md:text-sm text-white hover:text-[#d4af37] font-bold transition"
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
-            <Link
-              to="/login"
-              className="text-[12px] md:text-sm text-[#d4af37] font-bold hover:text-white transition"
+          {/* 🟢 MOBILE MENU (Hamburger) - Sirf phone par dikhega */}
+          <div className="relative md:hidden">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-gray-400 hover:text-[#d4af37] transition"
             >
-              Login/Register
-            </Link>
-          )}
-          {/* 🟢 BUTTON CODE YAHAN KHATAM */}
+              <i
+                className={`fas ${mobileMenuOpen ? "fa-times" : "fa-bars"} text-lg`}
+              ></i>
+            </button>
+
+            {/* Mobile Dropdown Menu */}
+            {mobileMenuOpen && (
+              <div className="absolute right-0 top-12 w-40 bg-[#111] border border-[#d4af37]/30 rounded-xl p-3 shadow-xl z-50 flex flex-col gap-2">
+                {user ? (
+                  <>
+                    <div className="text-[#d4af37] text-xs font-bold truncate px-2 py-1 border-b border-[#333]">
+                      {user.email}
+                    </div>
+                    <Link
+                      to="/profile"
+                      className="text-sm text-gray-300 hover:text-[#d4af37] px-2 py-1 rounded transition"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={async () => {
+                        setMobileMenuOpen(false);
+                        await signOut();
+                        navigate("/login");
+                      }}
+                      className="text-sm text-red-400 hover:text-red-500 px-2 py-1 rounded text-left transition"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="text-sm text-[#d4af37] font-bold px-2 py-1 rounded transition"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* 🟢 DESKTOP USER MENU - Sirf laptop par dikhega */}
+          <div className="hidden md:flex items-center gap-3">
+            {user ? (
+              <>
+                <span className="text-[12px] text-[#d4af37] max-w-[100px] truncate">
+                  {user.email}
+                </span>
+                <Link
+                  to="/profile"
+                  className="text-sm text-white hover:text-[#d4af37] font-bold transition"
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={async () => {
+                    await signOut();
+                    navigate("/login");
+                  }}
+                  className="text-sm text-white hover:text-[#d4af37] font-bold transition"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                className="text-sm text-[#d4af37] font-bold hover:text-white transition"
+              >
+                Login
+              </Link>
+            )}
+          </div>
 
           {/* Cart */}
           <Link
@@ -98,7 +148,7 @@ export default function Navbar({ onSearch }) {
             )}
           </Link>
 
-          {/* Wishlist with Badge */}
+          {/* Wishlist */}
           <Link
             to="/wishlist"
             className="relative text-gray-400 hover:text-[#d4af37] transition"

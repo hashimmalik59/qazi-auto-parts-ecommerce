@@ -2,13 +2,14 @@ import { useCart } from "../context/CartContext";
 import { Link } from "react-router-dom";
 import ProductCard from "./ProductCard";
 import { useAuth } from "../context/AuthContext";
-import { products } from "../data/products";
+import { useProducts } from "../hooks/useProducts"; // ✅ Naya import
 import { useToast } from "../context/ToastContext";
 
 export default function WishlistPage() {
   const { wishlist, wishlistCount, clearWishlist, removeFromWishlist } =
     useCart();
   const { user } = useAuth();
+  const { products, loading } = useProducts(); // ✅ Firestore se products fetch karo
   const { showToast } = useToast();
 
   if (!user) {

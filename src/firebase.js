@@ -1,6 +1,13 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore"; // ✅ YEH IMPORT ADD KIYA HAI
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  where,
+  addDoc,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA-YMSfe2HT614bO5NleTm8Qz4PTsQZ_Ec",
@@ -11,8 +18,9 @@ const firebaseConfig = {
   appId: "1:5802551883:web:df2730631b5d757e1ffbce",
 };
 
-// ✅ Yeh line add karna mat bhoolna!
 const app = initializeApp(firebaseConfig);
-
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// ✅ Yeh saare functions export karo
+export { collection, getDocs, query, where, addDoc };
