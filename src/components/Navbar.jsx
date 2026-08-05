@@ -52,14 +52,25 @@ export default function Navbar({ onSearch }) {
 
           {/* 🟢 FINAL LOGIN / LOGOUT BUTTON */}
           {user ? (
-            <div>
-              <span className="text-[12px] mx-2">{user.email}</span>
+            <div className="flex items-center gap-3">
+              <span className="text-[12px] text-[#d4af37] mx-2">
+                {user.email}
+              </span>
+
+              {/* 🔥 YEH NAYA LINK ADD KIYA HAI (PROFILE PAGE KE LIYE) */}
+              <Link
+                to="/profile"
+                className="text-white hover:text-[#d4af37] font-bold text-sm transition"
+              >
+                Profile
+              </Link>
+
               <button
                 onClick={async () => {
                   await signOut();
                   navigate("/login");
                 }}
-                className="text-red-400 hover:text-red-600 font-bold text-sm transition"
+                className="text-white hover:text-[#d4af37] font-bold text-sm transition"
               >
                 Logout
               </button>

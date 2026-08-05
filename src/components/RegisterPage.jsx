@@ -26,7 +26,20 @@ export default function RegisterPage() {
       showToast("Account created! Please check your email.", "success");
       navigate("/login");
     } catch (error) {
-      showToast(error.message, "error");
+      // 🔥 Firebase ke specific error codes handle kar diye hain
+      let message = "Registration failed. Please try again.";
+
+      if (error.code === "auth/email-already-in-use") {
+        message = "This email is already registered. Please login.";
+      } else if (error.code === "auth/weak-password") {
+        message = "Password should be at least 6 characters long.";
+      } else if (error.code === "auth/invalid-email") {
+        message = "Please enter a valid email address.";
+      } else if (error.message) {
+        message = error.message;
+      }
+
+      showToast(message, "error");
     } finally {
       setLoading(false);
     }

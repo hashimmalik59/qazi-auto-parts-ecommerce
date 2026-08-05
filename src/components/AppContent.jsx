@@ -18,6 +18,7 @@ import WishlistPage from "./WishlistPage";
 import NotFound from "./NotFound";
 import LoginPage from "./LoginPage";
 import RegisterPage from "./RegisterPage";
+import ProtectedRoute from "./ProtectedRoute"; // ✅ YEH IMPORT ADD KIYA HAI
 
 // Title change karne wala helper
 function usePageTitle(title) {
@@ -82,16 +83,31 @@ export default function AppContent() {
           element={<ProductsPageWrapper searchQuery={searchQuery} />}
         />
         <Route path="/product/:id" element={<ProductDetailWrapper />} />
-        <Route path="/cart" element={<CartPageWrapper />} />
-        <Route path="/wishlist" element={<WishlistPageWrapper />} />
+
+        {/* 🔥 PROTECTED ROUTES */}
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <CartPageWrapper />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/wishlist"
+          element={
+            <ProtectedRoute>
+              <WishlistPageWrapper />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="*" element={<NotFoundWrapper />} />
       </Routes>
 
       {!isAuthPage && <Footer />}
-
-      {/* 🟢 YAHAN 3 LINES UPDATE KI HAIN */}
       {!isAuthPage && <WhatsAppFloat />}
       {!isAuthPage && <ScrollToTop />}
       {!isAuthPage && <MobileNav />}

@@ -1,5 +1,11 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { supabase } from "../supabase";
+import { auth } from "../firebase";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from "firebase/auth";
 
 const AuthContext = createContext();
 
@@ -8,61 +14,32 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
       setLoading(false);
     });
-
-    // Listen for login/logout changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log("Auth Event:", event, "Session:", session);
-        if (event === "SIGNED_IN") {
-          setUser(session?.user ?? null);
-        } else if (event === "SIGNED_OUT") {
-          setUser(null);
-        }
-        setLoading(false);
-      },
-    );
-
-    // Cleanup function
-    return () => {
-      authListener?.subscription?.unsubscribe();
-    };
+    return () => unsubscribe();
   }, []);
 
+  // Register
   const signUp = async (email, password) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: window.location.origin,
-      },
-    });
-    if (error) throw error;
-    return data;
+    await createUserWithEmailAndPassword(auth, email, password);
   };
 
-  // Login (Sabse simple aur pakka version)
+  // Login
   const signIn = async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
-    return data;
+    await signInWithEmailAndPassword(auth, email, password);
   };
 
   // Logout
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
+  const signOutUser = async () => {
+    await signOut(auth);
   };
 
   return (
-    <AuthContext.Provider value={{ user, signUp, signIn, signOut, loading }}>
+    <AuthContext.Provider
+      value={{ user, signUp, signIn, signOut: signOutUser, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );
